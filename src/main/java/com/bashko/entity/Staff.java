@@ -1,23 +1,30 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
+
 import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "staff")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
-    Integer id;
+    Byte id;
 
     @Column(name = "first_name", length = 45, nullable = false)
     String firstName;
@@ -29,7 +36,9 @@ public class Staff {
     @JoinColumn(name = "address_id", nullable = false)
     Address address;
 
-    @Column(name = "picture")
+    @Lob
+    @Column(name = "picture", columnDefinition = "BLOB")
+    @ToString.Exclude
     Byte[] picture;
 
     @Column(name = "email", length = 50)
@@ -37,9 +46,11 @@ public class Staff {
 
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
+    @ToString.Exclude
     Store store;
 
-    @Column(name = "active", nullable = false)
+    @Column(name = "active", nullable = false, columnDefinition = "BIT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     Boolean active;
 
     @Column(name = "username", length = 16, nullable = false)
@@ -53,8 +64,10 @@ public class Staff {
     Timestamp lastUpdate;
 
     @OneToMany(mappedBy = "staff")
+    @ToString.Exclude
     Set<Rental> rental;
 
     @OneToMany(mappedBy = "staff")
+    @ToString.Exclude
     Set<Payment> payment;
 }

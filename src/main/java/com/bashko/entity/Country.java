@@ -1,24 +1,29 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
+
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "country")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "country_id")
-    Integer id;
+    Short id;
 
     @Column(name = "country", length = 50, nullable = false)
     String country;
@@ -28,5 +33,6 @@ public class Country {
     Timestamp lastUpdate;
 
     @OneToMany(mappedBy = "country")
-    Set<City>cities = new HashSet<>();
+    @ToString.Exclude
+    Set<City> cities;
 }

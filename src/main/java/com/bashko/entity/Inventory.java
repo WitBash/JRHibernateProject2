@@ -1,19 +1,25 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
+
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "inventory")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,5 +39,6 @@ public class Inventory {
     Timestamp lastUpdate;
 
     @OneToMany(mappedBy = "inventory")
-    Set<Rental> rental = new HashSet<>();
+    @ToString.Exclude
+    Set<Rental> rental;
 }

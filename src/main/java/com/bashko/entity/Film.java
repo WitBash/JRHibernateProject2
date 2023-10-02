@@ -1,35 +1,47 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.Year;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "film")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Film {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "film_id")
-    Integer id;
+    Short id;
 
     @Column(name = "title", nullable = false)
     String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "text")
+    @Type(type = "text")
     String description;
 
-    @Column(name = "release_year")
-    Date releaseYear;
+    @Column(name = "release_year", columnDefinition = "year")
+    @Convert(converter = YearInFilmConverter.class)
+    Year releaseYear;
 
     @ManyToOne
     @JoinColumn(name = "language_id", nullable = false)
@@ -40,40 +52,62 @@ public class Film {
     Language originalLanguage;
 
     @Column(name = "rental_duration", nullable = false)
-    Integer rentalDuration;
+    Byte rentalDuration;
 
     @Column(name = "rental_rate", nullable = false)
     BigDecimal rentalRate;
 
     @Column(name = "length")
-    Integer length;
+    Short length;
 
     @Column(name = "replacement_cost", nullable = false)
     BigDecimal replacementCost;
 
-    @Column(name = "rating")
-    String rating;
 
-    @Column(name = "special_features")
+    @Column(name = "rating", columnDefinition = "enum('G', 'PG', 'PG-13', 'R', 'NC-17')")
+    @Convert(converter = RatingConverter.class)
+    Rating rating;
+
+    @Column(name = "special_features", columnDefinition = "set('Trailers', 'Commentaries', 'Deleted Scenes', 'Behind the Scenes')")
     String specialFeatures;
 
     @UpdateTimestamp
     @Column(name = "last_update", nullable = false)
     Timestamp lastUpdate;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            fetch = FetchType.LAZY, mappedBy = "films")
-    Set<Actor> actors = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "film_actor",
+            joinColumns = @JoinColumn(name = "film_id", referencedColumnName = "film_id"),
+            inverseJoinColumns = @JoinColumn(name = "actor_id", referencedColumnName = "actor_id"))
+    @ToString.Exclude
+    Set<Actor> actors;
 
     @ManyToMany
     @JoinTable(name = "film_category",
-            joinColumns = @JoinColumn(name = "film_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
-    Set<Category> categories = new HashSet<>();
+            joinColumns = @JoinColumn(name = "film_id", referencedColumnName = "film_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "category_id"))
+    @ToString.Exclude
+    Set<Category> categories;
 
     @OneToMany(mappedBy = "film")
-    Set<Inventory> inventories = new HashSet<>();
+    @ToString.Exclude
+    Set<Inventory> inventories;
 
-    @OneToOne(mappedBy = "film")
-    FilmText filmText;
+    public void setSpecialFeatures(Set<Feature> features) {
+        if (isNull(features)) specialFeatures = null;
+        else specialFeatures = features.stream().map(Feature::getValue).collect(Collectors.joining(","));
+    }
+
+    public Set<Feature> getSpecialFeatures() {
+        if (isNull(specialFeatures) || specialFeatures.isEmpty()) return null;
+
+        Set<Feature> featureSet = new HashSet<>();
+
+        String[] specialFeaturesArray = specialFeatures.split(",");
+        for (String str : specialFeaturesArray) {
+            featureSet.forEach(feature -> featureSet.add(Feature.getFeatureByValue(str)));
+        }
+        featureSet.remove(null);
+        return featureSet;
+    }
 }

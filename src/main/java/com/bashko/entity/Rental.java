@@ -1,18 +1,24 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "rental")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Rental {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,5 +48,6 @@ public class Rental {
     Timestamp lastUpdate;
 
     @OneToOne(mappedBy = "rental")
+    @ToString.Exclude
     Payment payment;
 }

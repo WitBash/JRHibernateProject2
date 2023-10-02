@@ -1,8 +1,8 @@
 package com.bashko.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.*;
@@ -11,14 +11,20 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "payment")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Builder
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    Integer id;
+    Short id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
@@ -35,6 +41,7 @@ public class Payment {
     @Column(name = "amount", nullable = false)
     BigDecimal amount;
 
+    @CreationTimestamp
     @Column(name = "payment_date", nullable = false)
     LocalDateTime paymentDate;
 
