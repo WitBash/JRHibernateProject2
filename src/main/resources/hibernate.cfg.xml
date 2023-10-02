@@ -4,10 +4,9 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-                <property name="connection.url">jdbc:p6spy:mysql://localhost:3306/test</property>
-                <property name="connection.driver_class">com.p6spy.engine.spy.P6SpyDriver</property>
-<!--        <property name="connection.url">jdbc:mysql://localhost:3306/test</property>-->
-<!--        <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>-->
+        <property name="connection.url">jdbc:p6spy:mysql://localhost:3306/test</property>
+        <property name="connection.driver_class">com.p6spy.engine.spy.P6SpyDriver</property>
+
         <property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>
 
         <property name="connection.username">root</property>
